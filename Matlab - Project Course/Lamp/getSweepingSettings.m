@@ -1,5 +1,21 @@
-%%Sweeping settings: Spectometer Settings used for sweeping.
 function [settings] = getSweepingSettings()
+% Spectometer Settings used for sweeping
+%
+% Syntax:  [settings] = getSweepingSettings()
+%
+% Inputs:
+%    None
+%
+% Outputs:
+%    settings - A scruct of settings
+%
+%
+% Other m-files required: None
+% MAT-files required: None
+% Other requirments:None
+%
+% December 2019; Last revision: 03-December-2019
+%------------- BEGIN CODE --------------
 settings = struct();
 settings.IT = 100000; %ms
 settings.ScansToAverage = 2;

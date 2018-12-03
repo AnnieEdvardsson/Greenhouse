@@ -1,0 +1,17 @@
+Untracked files, pull, do:
+
+git add * 
+git stash
+git pull
+
+Untracked files, push, do:
+
+git add .
+git commit -a
+"Write a msg, press esc and then press ZZ"
+git push
+
+
+Merge stuff
+
+https://stackoverflow.com/questions/161813/how-to-resolve-merge-conflicts-in-git
