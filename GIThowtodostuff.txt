@@ -1,9 +1,25 @@
+Push a file to GIT:
+git add "filname.txt"
+git commit -m "write what you changed here"
+git push
+
+----------------------------------------------------------------------
+Pull a file from GIT:
+git pull
+
+----------------------------------------------------------------------
+Remove files:
+git rm file1.txt
+git commit -m "remove file1.txt"
+
+----------------------------------------------------------------------
 Untracked files, pull, do:
 
 git add * 
 git stash
 git pull
 
+----------------------------------------------------------------------
 Untracked files, push, do:
 
 git add .
@@ -13,15 +29,13 @@ OR
 
 git add -A
 
-
-merge conflicts
+----------------------------------------------------------------------
+merge conflicts:
 use
 git mergetool
 
-Reset everything (you have on your computer) and force pull remote
+----------------------------------------------------------------------
+Reset everything (you have on your computer) and force pull remote:
 git fetch --all
 git reset --hard origin/master
 
-Remove files
-git rm file1.txt
-git commit -m "remove file1.txt"
