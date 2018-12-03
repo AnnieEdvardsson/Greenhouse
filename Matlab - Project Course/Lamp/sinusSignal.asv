@@ -14,8 +14,8 @@ settings.conv = getSettings();
 %% Define variables
 wavelengths = [0 1 0 0 0 0 0];  % wavelengths used in excitation signal 
 period_t    = 60;               % period time in seconds, could be one value or a vector of length(wavelengths)
-amplitude  = 10;                % amplitude of excitation signal given in uE 
-meanvalue = 20;
+amplitude  = 30;                % amplitude of excitation signal given in uE 
+meanvalue = 50;
 step_length = 1;
 i = 0;
 
@@ -29,17 +29,16 @@ webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=man
 
 %% Loop through a sinus signal
 %while true
-for j = 0:59 
-    fprintf("Loop #%i -- ", j);
+for j = 1:60 
+    fprintf("Loop number %i  --  ", j);
     i = i+1;
     t = i*step_length;
     desired_intensity = meanvalue + amplitude.* (sin(2*pi*1./period_t.*t));
     %desired_intensities = desired_intensity * wavelengths;
     ledIN(i,:) = intensity2LEDinput(desired_intensity, settings.conv.lamp_ip);
-    pause(1)
-    meas_int(i) = spectrometer_measurement(Spectrometers);
-    fprintf(" -- measured intensity %2.2f, wanted it to be %2.2f  \n", meas_int(i),desired_intensity);
-    %pause(step_length)
+    meas_int(i) = spectrometer_measurement(settings_spec, Spectrometers,);
+    fprintf("  --  measured intensity %i  \n", meas_int(i));
+    pause(step_length)
 end
 
 %% Turn off fan and lamp
@@ -61,6 +60,3 @@ for ii = 1:length(settings.conv.LEDs)
     h.Color = rgb;
 end
 legend('show')
-
-%figure
-plot(meas_int);

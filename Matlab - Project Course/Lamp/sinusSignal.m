@@ -12,9 +12,8 @@ settings.conv = getSettings();
 
 
 %% Define variables
-wavelengths = [0 1 0 0 0 0 0];  % wavelengths used in excitation signal 
 period_t    = 60;               % period time in seconds, could be one value or a vector of length(wavelengths)
-amplitude  = 10;                % amplitude of excitation signal given in uE 
+amplitude  = 10;                % amplitude of excitation signal given in uE 40-60 
 meanvalue = 20;
 step_length = 1;
 i = 0;
@@ -34,7 +33,6 @@ for j = 0:59
     i = i+1;
     t = i*step_length;
     desired_intensity = meanvalue + amplitude.* (sin(2*pi*1./period_t.*t));
-    %desired_intensities = desired_intensity * wavelengths;
     ledIN(i,:) = intensity2LEDinput(desired_intensity, settings.conv.lamp_ip);
     pause(1)
     meas_int(i) = spectrometer_measurement(Spectrometers);
