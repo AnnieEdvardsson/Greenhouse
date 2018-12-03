@@ -8,10 +8,20 @@ Untracked files, push, do:
 
 git add .
 git commit -a
-"Write a msg, press esc and then press ZZ"
-git push
+
+OR 
+
+git add -A
 
 
-Merge stuff
+merge conflicts
+use
+git mergetool
 
-https://stackoverflow.com/questions/161813/how-to-resolve-merge-conflicts-in-git
+Reset everything (you have on your computer) and force pull remote
+git fetch --all
+git reset --hard origin/master
+
+Remove files
+git rm file1.txt
+git commit -m "remove file1.txt"
