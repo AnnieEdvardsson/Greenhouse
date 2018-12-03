@@ -1,6 +1,8 @@
 fs = 100;                 %sample rate
 t = 0:1/fs:120;
 x = sin(2*pi/60*t) + randn(size(t))/100;    %noisy signal
+
+
 w = 2*pi/60;              %angular frequency of sinusoid
 f = w/(2*pi);             %frequency of sinusoid
 

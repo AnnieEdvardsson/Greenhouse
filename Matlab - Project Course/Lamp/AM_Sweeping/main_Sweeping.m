@@ -62,7 +62,7 @@ end
 %% Choose the LED-groups that should be swept and the lamp input values:
 LEDs = [380 400 420 450 530 620 660 735 5700]; %nm
 %Sweeping from high to low light intensities.
-Intensities  = 1000:-100:0; %lamp-input-values
+Intensities  = 1000:-1:0; %lamp-input-values
 
 %% Variables for storage of data
 IT              = zeros(length(LEDs),length(Intensities)); %stores integrationtime (ms) for each measured lamp input level

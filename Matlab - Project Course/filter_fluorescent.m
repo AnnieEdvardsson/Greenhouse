@@ -10,20 +10,21 @@ function filtredSignal = filter_fluorescent(signal)
 %    filtredSignal - The filtred fluorescent signal, [1,n]
 %
 %
-% Other m-files required: none
+% Other m-files required: signal_settings.m
 % MAT-files required: none
 %
 % November 2019; Last revision: 30-November-2019
 %------------- BEGIN CODE --------------
-%% Design filter
-% The size of the window (the bigger the less it follows measured signal)
-windowSize = 25;    
-b = (1/windowSize)*ones(1,windowSize);
+%% Load settings from signal_settings.m
+s_settings.conv = signal_settings();
 
-% The order
-a = 1;              
+%% Design filter
+wo = s_settings.conv.f/(s_settings.conv.fs/2);  % location of the notch, must be between 0 and 1                  
+bw = wo/0.1;                                    % bandwidth at -3 dB
+[b,a] = iirnotch(wo,bw);                        % gives numerator and denominator coeffiecients for filter function
 
 %% Add filter to signal
-filtredSignal = filter(b,a,signal);
+z = filter(b,a,signal);                         % filters the noisy signal, should leave noise only
+filtredSignal = signal-z;                       % Subtract the noise from original signal 
 
 end
