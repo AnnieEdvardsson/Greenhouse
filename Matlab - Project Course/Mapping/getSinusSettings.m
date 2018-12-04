@@ -23,5 +23,9 @@ settings.spectrum = [0 0 0 0 0 0.3 0.3 0.4 0];
 settings.sweepingsMatrix = 'Sweeping_RX2018-11-27-1414.mat';
 settings.lamp_ip = '192.168.100.102'; 
 
+s_settings.period_t    = 60;               % period time in seconds, could be one value or a vector of length(wavelengths)
+s_settings.amplitude  = 10;                % amplitude of excitation signal given in uE 
+s_settings.step_length = 1;
+
 
 end

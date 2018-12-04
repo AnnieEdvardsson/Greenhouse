@@ -7,4 +7,6 @@ s_settings.f = w/(2*pi);        % frequency of sinusoid
 
 
 
+
+
 end
