@@ -3,8 +3,8 @@ function phase_deg = estimate_phase(x,y)
 % Syntax: Estimates phase shift between two signals
 %
 % Inputs:
-%   x - input signal
-%   y - output signal
+%   x - input signal, the signal from LED lights
+%   y - output signal, the measured filtered fluorescence
 %
 % Outputs:
 %   phase_deg - estimated phase shift in degrees
