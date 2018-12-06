@@ -17,7 +17,7 @@ Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) commu
 
 %% Other 
 % Turn on fan on maximum speed
-FanConfiguration("Max")
+webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=manual&value=255'),'');
 
 %% Timekeeper
 
@@ -36,11 +36,46 @@ end
 %% MAIN LOOP
 tStart = tic; % Restart clock
 for i = 0:(period-1) * 10
-    [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange);
+    fprintf("MAIN Loop #%i -- ", i+1);
+    
+    %% Generate sinus + store flour signal from LED
+    % Create calculate sinus signal and set LED value 
+    % Return the LED value in flour spectrum
+    flourLEDValue =  sinusSignal(meanvalue, toc(tStart));
+    
+    % Add returned flourLEDValue value to vector flourLEDsignal
+    flourLEDsignal = updateVector(flourLEDsignal, flourLEDValue, period);
+    
+    %% Pause until it can be ensured that the LEDs are set
+    while toc(tStart) < sampleTime*i + pauseAfterLEDchange
+    end
+    
+    %% Measure fluroescent from plants and store and process
+    % Measure emitted flour from plants
+    flourPlantValue = measure_fluorescence();
+    
+    % Add returned flourPlantValue value to vector flourPlantsignal
+    flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, period);
+    
+    % Process the LED signal in flour spectrum
+    filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
+    
+    %% Estimate the phase shift
+    phase_shift = estimate_phase(flourLEDsignal, filtredPlantFlourSignal);
+    
+    %% Controller
+    % PID controller
+    
+    
+    %% Pause intil the sample time of the loop is finished
+    while toc(tStart) < sampleTime*(i+1)
+    end
+
+
 end
 %% Other 
 % Turn off fan
-FanConfiguration("Off")
+webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=default'),'');
 
 % Turn off lamp
 LEDintensity = zeros(1,length(settings.conv.LEDs));
@@ -90,8 +125,8 @@ function  [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPl
     end
 end
 
-function  [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange)
-	fprintf("MAIN Loop #%i -- ", i+1);
+function  [flourLEDsignal, flourPlantsignal]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange)
+	fprintf("PRE Loop #%i -- ", i+1);
     
     %% Generate sinus + store flour signal from LED
     % Create calculate sinus signal and set LED value 
@@ -111,16 +146,6 @@ function  [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsig
     
     % Add returned flourPlantValue value to vector flourPlantsignal
     flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, period);
-    
-    % Process the LED signal in flour spectrum
-    filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
-    
-    %% Estimate the phase shift
-    phase_shift = estimate_phase(flourLEDsignal, filtredPlantFlourSignal);
-    
-    %% Controller
-    % PID controller
-    
     
     %% Pause intil the sample time of the loop is finished
     while toc(tStart) < sampleTime*(i+1)
