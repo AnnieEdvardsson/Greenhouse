@@ -3,8 +3,14 @@
 clear; close all; clc; format long;
 
 %% Pre-define and initiate
+NrPeriods = 10;
+
 flourLEDsignal = [];
 filtredPlantFlourSignal = [];
+
+%% Load settings
+% Load settings from signal_settings.m
+s_settings.conv = signal_settings();
 
 % Get settings for the sinus signal (period, amplitude etc)
 settings.s = getSinusSettings();
@@ -20,32 +26,26 @@ Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) commu
 FanConfiguration("Max")
 
 %% Timekeeper
-
-tStart = tic;
-pauseAfterLEDchange = 0.5;
-sampleTime = 2;
-
-%tElapsed = toc(tStart)
+tStart = tic;               % Start clock
+pauseAfterLEDchange = 0.5;  % Time LED lamps have to changed to defined value
+sampleTime = 2;             % Time for one loop 
 
 %% PRE LOOP (to generate flourLEDsignal and flourPlantsignal)
 for i = 0:(period-1)
     [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange);
 end
 
-
 %% MAIN LOOP
 tStart = tic; % Restart clock
-for i = 0:(period-1) * 10
+for i = 0:(period-1) * NrPeriods
     [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange);
 end
 %% Other 
 % Turn off fan
-FanConfiguration("Off")
+FanConfiguration("Off");
 
 % Turn off lamp
-LEDintensity = zeros(1,length(settings.conv.LEDs));
-LEDintensity_wwString = mat2wwString(LEDintensity,settings.conv.lamp_ip);
-webwrite(LEDintensity_wwString{1,1},'');
+TurnOffLamp(s_settings.conv.LEDs, s_settings.conv.lamp_ip);
 
 
 %% Plot figure
@@ -62,7 +62,7 @@ webwrite(LEDintensity_wwString{1,1},'');
 % %figure
 % plot(meas_int);
 
-
+%%%%%%%%% FUNCTIONS %%%%%%%%%%%
 function  [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange)
 	fprintf("PRE Loop #%i -- ", i+1);
     
@@ -127,3 +127,8 @@ function  [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsig
     end
 end
 
+function TurnOffLamp(LEDs, lamp_ip)
+    LEDintensity = zeros(1,length(LEDs));
+    LEDintensity_wwString = mat2wwString(LEDintensity,lamp_ip);
+    webwrite(LEDintensity_wwString{1,1},'');
+end

@@ -1,6 +1,6 @@
-function [] = FanConfiguration(Setting)
+function FanConfiguration(Setting)
 %
-% Syntax:  
+% Syntax:  FanConfiguration(Setting)
 %
 % Inputs:
 %    Settings - Wanted value on fan
