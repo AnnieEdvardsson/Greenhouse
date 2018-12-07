@@ -17,20 +17,21 @@ function FanConfiguration(Setting)
 %------------- BEGIN CODE --------------
 
 settings.conv = getSinusSettings();
+lamp_ip = settings.conv.lamp_ip;
 
 
 switch Setting
     case "Default"
-        webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=default'),'');
+        webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=default'),'');
         
     case "Max"
-        webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=default'),'');
+        webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=manual&value=255'),'')
         
     case "Off"
-        webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=default'),'');
+        webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=default'),'');
 
     otherwise
-        webwrite(strcat('http://',settings.conv.lamp_ip,'/config.cgi?action=fan&mode=',Setting),'');
+        webwrite(strcat('http://',lamp_ip,'//config.cgi?action=fan&mode=manual&value=',Setting),'');
 end
 
 

@@ -24,7 +24,7 @@ function updated_vector = updateVector(vector, element, max_length)
 updated_vector = [vector, element];
 
 %% Se if #element is larger than max_length, if so remove first element
-if length(max_length) > max_length
+if length(updated_vector) > max_length
     
     updated_vector = updated_vector(2:end);
 end

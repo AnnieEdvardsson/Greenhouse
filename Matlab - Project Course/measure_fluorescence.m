@@ -1,7 +1,12 @@
 function [measurement] = measure_fluorescence(Spectrometers)
+current_spect   = Spectrometers(1);
+SpecIdx         = current_spect.Index;
 
+FULL_SPECTRUM             = [300 800];
+for i = 1:length(Spectrometers)
+    int_index(1,:,i)  = FULL_SPECTRUM;
+end
 
-SpecIdx = Spectometers.Index;
 current_spect.Wrapper.setIntegrationTime(SpecIdx,8000);
 Spectrometers.Spectra{1,2} = Spectrometers.Wrapper.getSpectrum(SpecIdx);
 

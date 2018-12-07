@@ -53,8 +53,6 @@ end
 LEDintensity_wwString = mat2wwString(LEDintensity,lamp_ip);
 webwrite(LEDintensity_wwString{1,1},'');
 
-fprintf("The intensity is: %i %i %i %i %i %i %i %i %i", LEDintensity);
-
 end
 
 
