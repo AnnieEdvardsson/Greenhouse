@@ -39,13 +39,14 @@ sampleTime = 2;             % Time for one loop
 %% PRE LOOP (to generate flourLEDsignal and flourPlantsignal)
 for i = 0:(period-1)
     [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers);
+    fprintf("TIME after loop: %2.1f \n", toc(tStart));
 end
 
 %% MAIN LOOP
 tStart = tic; % Restart clock
 for i = 0:(period-1) * NrPeriods
     [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers);
-    fprintf("flourLEDsignal= %i, flourPlantsignal = %i, meanvalue= %i \n",flourLEDsignal(end), flourPlantsignal(end), meanvalue); 
+    fprintf("flourLEDsignal= %2.1f, flourPlantsignal = %2.1f, meanvalue= %i \n",flourLEDsignal(end), flourPlantsignal(end), meanvalue); 
 end
 %% Other 
 % Turn off fan
@@ -97,29 +98,33 @@ function  [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPl
     end
 end
 
-function  [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers)
 	fprintf("MAIN Loop #%i : ", i+1);
     
     %% Generate sinus + store flour signal from LED
     % Create calculate sinus signal and set LED value 
     % Return the LED value in flour spectrum
-    flourLEDValue =  sinusSignal(meanvalue, toc(tStart));
+    flourLEDValue =  sinusSignal(toc(tStart));
     
     % Add returned flourLEDValue value to vector flourLEDsignal
     flourLEDsignal = updateVector(flourLEDsignal, flourLEDValue, period);
+    
+    %% Change background light with the new wanted intensity
+    
+    generateBackgroundLight(backgroundIntensity);
     
     %% Pause until it can be ensured that the LEDs are set
     while toc(tStart) < sampleTime*i + pauseAfterLEDchange
     end
     
     %% Measure fluroescent from plants and store and process
-    % Measure emitted flour from plants
+    % Measure emitted fluoresence from plants
     flourPlantValue = measure_fluorescence(Spectrometers);
     
-    % Add returned flourPlantValue value to vector flourPlantsignal
+    % Add measured value to fluoresence signal vector
     flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, period);
     
-    % Process the LED signal in flour spectrum
+    % Filter the measured fluoresence signal
     filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
     
     %% Estimate the phase shift

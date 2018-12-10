@@ -1,12 +1,12 @@
-function LEDintensity = intensity2LEDinput(intensity, lamp_ip)
+function LEDintensity = intensity2LEDinput(intensity, LAMP_ID)
 % Convert the inputed intensity to LED lamp inputs
 %
 % Syntax:  LEDintensity = intensity2LEDinput(intensity, lamp_ip)
 %
 % Inputs:
-%    intensity - The wanted intensity
-%    lamp_ip - A string of the ip of the LED lamp
-%
+%    intensity -    The wanted intensity
+%    lamp_ID -      Defines which lamp e want to convert, RX or LX (sinus
+%                   or background)
 % Outputs:
 %    LEDintensity - The LED lamp input
 %
@@ -15,11 +15,22 @@ function LEDintensity = intensity2LEDinput(intensity, lamp_ip)
 % MAT-files required: sweepingsMatrix.mat (name found in get.Settings.m)
 % Other requirments: Connection to LED lamp defined in lamp_ip
 %
-% November 2019; Last revision: 30-November-2019
+% November 2019; Last revision: 13-December-2019
 %------------- BEGIN CODE --------------
 
-% Load settings 
-settings.conv = getSinusSettings();
+% Load settings depening on which lamp (RX or LX)
+if (LAMP_ID == "RX")
+    settings.conv = getSinusSettings();
+    j = 3;
+    
+elseif (LAMP_ID == "LX")
+    settings.conv = getBackgroundSettings();
+    j = 0;
+        
+else
+     disp("WRONG LAMP ID IS INPUTED TO THE FUNCTION, CHOOSE 'RX' or 'LX'");   
+        
+end
 
 % Load Sweeping matrix LEDS??
 load(settings.conv.sweepingsMatrix, 'LEDs', 'intIRRmatrix', 'lampINTmatrix')
@@ -31,7 +42,7 @@ LEDintensity = zeros(1, length(LEDs));
 spectrumintensity = settings.conv.spectrum*intensity;
 
 % Loop through all LEDS
-for indexLed = 3:length(LEDs)
+for indexLed = j:length(LEDs)
     
     % Save in new matrix
     SweepingIRR = intIRRmatrix(indexLed, :);

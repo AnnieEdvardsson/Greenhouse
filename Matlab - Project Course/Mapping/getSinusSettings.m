@@ -18,14 +18,16 @@ function settings = getSinusSettings()
 %------------- BEGIN CODE --------------
 settings =                  struct();
 settings.LEDs =             [380 400 420  450 530 620 660 735 5700];
-%settings.spectrum = [0 0 0.2 0.2 0.3 0.3 0.3 0.5 0];
-settings.spectrum =         [0 0 0 0 0 0.3 0.3 0.4 0];
+
+% We only want in the fluoresence spectrum i.e. 420 or 450 nm
+settings.spectrum =         [0 0 1 0 0 0 0 0 0];   
+
 settings.sweepingsMatrix =  'Sweeping_RX2018-11-27-1414.mat';
 settings.lamp_ip =          '192.168.100.102'; 
+settings.lamp_ID =           "RX";
 
 settings.period =         60;           % period time in seconds
 settings.amplitude =      10;           % amplitude of excitation signal given in uE 
-settings.step_length =    1;            % 
-
+settings.meanvalue =      40;           % The meanvalue of the sinus
 
 end
