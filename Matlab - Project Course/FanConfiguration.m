@@ -25,7 +25,7 @@ switch Setting
         webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=default'),'');
         
     case "Max"
-        webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=manual&value=255'),'')
+        webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=manual&value=255'),'');
         
     case "Off"
         webwrite(strcat('http://',lamp_ip,'/config.cgi?action=fan&mode=default'),'');

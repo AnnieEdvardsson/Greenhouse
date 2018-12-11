@@ -22,8 +22,8 @@ function generateBackgroundLight(intensity)
 
 %% Load settings 
 settings.conv =     getBackgroundSettings();
-lamp_ip =           settings.lamp_ip;
-lamp_ID =           settingd.lamp_ID;
+lamp_ip =           settings.conv.lamp_ip;
+lamp_ID =           settings.conv.lamp_ID;
 
 %% Calculate LED intensity with mapping
 LEDintensity = intensity2LEDinput(intensity, lamp_ID);

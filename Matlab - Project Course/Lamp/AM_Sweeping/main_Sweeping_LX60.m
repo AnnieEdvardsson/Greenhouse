@@ -66,13 +66,12 @@ LEDs =             [450 451 660 661 5700 5701];
 Intensities  = 1000:-1:0; %lamp-input-values
 
 vec = [1 3 5];
-%vec = [1 3];
 
 %% Variables for storage of data
-IT              = zeros(length(vec),length(Intensities)); %stores integrationtime (ms) for each measured lamp input level
-intIRRmatrix    = zeros(length(vec),length(Intensities)); %stores measured light intensities in mu mole photons/m^2/s^-1, calculated based on counts and calibration-values 
-lampINTmatrix   = zeros(length(vec),length(Intensities)); %stores lamp-input-values
-spectra         = cell(length(vec),length(Intensities));  %stores the measured raw spectra
+IT              = zeros(length(LEDs),length(Intensities)); %stores integrationtime (ms) for each measured lamp input level
+intIRRmatrix    = zeros(length(LEDs),length(Intensities)); %stores measured light intensities in mu mole photons/m^2/s^-1, calculated based on counts and calibration-values 
+lampINTmatrix   = zeros(length(LEDs),length(Intensities)); %stores lamp-input-values
+spectra         = cell(length(LEDs),length(Intensities));  %stores the measured raw spectra
 
 %% Sweeping
 current_spect.Wrapper.setIntegrationTime(SpecIdx,1000000);
@@ -101,9 +100,11 @@ for i = 1:2
             spectrum_temp = current_spect.Wrapper.getSpectrum(SpecIdx);
         end
         IT(LEDidx,INTidx) = current_spect.Wrapper.getIntegrationTime(SpecIdx); %read integration time from spectrometer
+        IT(LEDidx+1,INTidx) = IT(LEDidx,INTidx);
         current_spect.IT  = IT(LEDidx,INTidx);
         current_spect.Spectra{1,2} = spectrum_temp;
         spectra{LEDidx,INTidx} = spectrum_temp;
+        spectra{LEDidx+1,INTidx} = spectrum_temp;
         
         %Calculating integrated irradiance for the wavelength interval(s) contained in int_index
         %based on calibration of the spectrometer performed at the date contained in settings.calibDate
@@ -111,6 +112,9 @@ for i = 1:2
         
         intIRRmatrix(LEDidx,INTidx)  = DATA.intIRR.spec_uEin_int{1,1}; %measured light intensities in mu mole photons/m^2/s^-1
         lampINTmatrix(LEDidx,INTidx) = Intensities(INTidx); 
+        
+        intIRRmatrix(LEDidx+1,INTidx) = intIRRmatrix(LEDidx,INTidx);
+        lampINTmatrix(LEDidx+1,INTidx) = lampINTmatrix(LEDidx,INTidx);
         
     end
     save(strcat('','PART',Msg,datestr(now,'yyyy-mm-dd-HHMM')),'intIRRmatrix','lampINTmatrix','spectra','IT','settings','Info')

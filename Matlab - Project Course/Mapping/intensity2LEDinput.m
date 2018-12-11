@@ -25,7 +25,7 @@ if (LAMP_ID == "RX")
     
 elseif (LAMP_ID == "LX")
     settings.conv = getBackgroundSettings();
-    j = 0;
+    j = 1;
         
 else
      disp("WRONG LAMP ID IS INPUTED TO THE FUNCTION, CHOOSE 'RX' or 'LX'");   
@@ -59,10 +59,6 @@ for indexLed = j:length(LEDs)
     end
 
 end
-  
-% Set the LEDS to the intensity defined in LEDintensity
-LEDintensity_wwString = mat2wwString(LEDintensity,lamp_ip);
-webwrite(LEDintensity_wwString{1,1},'');
 
 end
 

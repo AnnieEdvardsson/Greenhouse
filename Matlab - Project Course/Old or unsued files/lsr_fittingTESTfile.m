@@ -1,4 +1,3 @@
-clc; clear; close all
 
 %  y = 0;
 % line([0,900],[y,y])
@@ -37,28 +36,28 @@ clc; clear; close all
 % % 
 % % %%
 % % 
-%  fs = 14*60;
-%  t = linspace(0,2*pi,fs);
+fs = 1000;
+t = linspace(0,2*pi,fs);
 %  % 1 kHz and 3 kHz sine waves
-%  x = sin(t) + 0.2*rand(size(t));
-%  % Lowpass filter everything below 20 kHz
-% %  
-% % %  % Specify the filter
-% % %  d = fdesign.bandpass(); %'Fst1,Fp1,Fp2,Fst2,Ast1,Ap,Ast2', ...
-% % %     %1/4,3/8,5/8,6/8,60,1,60);
-% % % 
-% % %  % Design the filter
-% % %  hd = design(d);
-% % %  
-% % %  % apply the filter
-% % %  y = filter(hd,x);
-% % 
-% % % y = bandpass(x, [0.1 2.5], fs)
-% % % %y = bandpass(x, [0.12 0.2], fs)
-% % %  subplot(211)
-% % %  plot(t,x); title('Original Waveform');
-% % %  subplot(212)
-% % %  plot(t,y); title('Filtered Waveform');
+x = sin(t) + 0.2*rand(size(t));
+%Lowpass filter everything below 20 kHz
+ 
+ % Specify the filter
+ d = fdesign.bandpass(); %'Fst1,Fp1,Fp2,Fst2,Ast1,Ap,Ast2', ...
+    %1/4,3/8,5/8,6/8,60,1,60);
+
+ % Design the filter
+ hd = design(d);
+ 
+ % apply the filter
+ y = filter(hd,x);
+
+y = bandpass(x, [0.1 2.5], fs)
+%y = bandpass(x, [0.12 0.2], fs)
+ subplot(211)
+ plot(t,x); title('Original Waveform');
+ subplot(212)
+ plot(t,y); title('Filtered Waveform');
 % % %  figure;
 % % %  subplot(211)
 % % %  plot(psd(spectrum.periodogram,x,'Fs',fs,'NFFT',length(x)));
@@ -87,14 +86,14 @@ clc; clear; close all
 % helperFrequencyAnalysisPlot1(F,magnitudeY,phaseY,NFFT)
 
 % 
-Ts = 0.5; % In seconden
-fs = 1000; % Een beeld per 9 seconden
-np = 1;
-
-t = linspace(0,4*pi,fs);
-u = sin(t); % + 0.2*rand(size(t));
-y = sin(t+pi/2); % + 0.2*rand(size(t));
-
-data = iddata(y,u,Ts);
-
-sys = tfest(data,np)
+% Ts = 0.5; % In seconden
+% fs = 1000; % Een beeld per 9 seconden
+% np = 1;
+% 
+% t = linspace(0,4*pi,fs);
+% u = sin(t); % + 0.2*rand(size(t));
+% y = sin(t+pi/2); % + 0.2*rand(size(t));
+% 
+% data = iddata(y,u,Ts);
+% 
+% sys = tfest(data,np)

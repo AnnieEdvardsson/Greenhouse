@@ -14,7 +14,7 @@ function settings = getSinusSettings()
 % MAT-files required: None
 % Other requirments:None
 %
-% December 2018; Last revision: 03-December-2018
+% December 2018; Last revision: 11-December-2018
 %------------- BEGIN CODE --------------
 settings =                  struct();
 settings.LEDs =             [380 400 420  450 530 620 660 735 5700];
