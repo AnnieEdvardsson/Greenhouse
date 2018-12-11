@@ -7,7 +7,11 @@ NrPeriods = 1;
 
 flourLEDsignal = [];
 flourPlantsignal = [];
-meanvalue = 40;
+
+% Start values
+backgroundIntensity = 40;  
+prev_error = 0; 
+cum_error = 0;
 
 %% Define paths
 
@@ -38,15 +42,15 @@ sampleTime = 2;             % Time for one loop
 
 %% PRE LOOP (to generate flourLEDsignal and flourPlantsignal)
 for i = 0:(period-1)
-    [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers);
+    [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers);
     fprintf("TIME after loop: %2.1f \n", toc(tStart));
 end
 
 %% MAIN LOOP
 tStart = tic; % Restart clock
 for i = 0:(period-1) * NrPeriods
-    [flourLEDsignal, flourPlantsignal, meanvalue]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, meanvalue, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers);
-    fprintf("flourLEDsignal= %2.1f, flourPlantsignal = %2.1f, meanvalue= %i \n",flourLEDsignal(end), flourPlantsignal(end), meanvalue); 
+    [flourLEDsignal, flourPlantsignal, backgroundIntensity, error, cum_error]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, error, cum_error);
+    fprintf("flourLEDsignal= %2.1f, flourPlantsignal = %2.1f, backgroundIntensity= %i \n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity); 
 end
 %% Other 
 % Turn off fan
@@ -98,7 +102,7 @@ function  [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPl
     end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, error, cum_error]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, prev_error, cum_error)
 	fprintf("MAIN Loop #%i : ", i+1);
     
     %% Generate sinus + store flour signal from LED
@@ -132,7 +136,7 @@ function  [flourLEDsignal, flourPlantsignal, backgroundIntensity]= MAINLOOP(i, f
     
     %% Controller
     % PID controller
-    
+    [backgroundIntensity, error, cum_error] = pid_control(phase_shift, prev_error, cum_error, sampleTime);
     
     %% Pause intil the sample time of the loop is finished
     while toc(tStart) < sampleTime*(i+1)

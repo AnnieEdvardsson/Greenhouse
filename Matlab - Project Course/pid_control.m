@@ -1,7 +1,8 @@
-function [u,error,cum_error] = pid_control(theta,r,prev_error,cum_error,time_step,Kp,Ki,Kd)
-%
-% Syntax: finds the new control input to the lamp based on error between
+function [u, error, cum_error] = pid_control(theta, prev_error, cum_error, time_step)
+% Finds the new control input to the lamp based on error between
 % the desired phase shift and the estimated phase shift
+%
+% Syntax: [u,error,cum_error] = pid_control(theta,prev_error,cum_error,time_step)
 %
 % Inputs:
 %   theta - estimated phase shift
@@ -9,9 +10,7 @@ function [u,error,cum_error] = pid_control(theta,r,prev_error,cum_error,time_ste
 %   prev_error - error in the previous time step
 %   cum_error - cumulative error in the last time step
 %   time_step - time passed between calling this function
-%   Kp - proportionate coefficient
-%   Ki - integral coefficient
-%   Kp - derivativee coefficient
+
 %
 % Outputs:
 %   u - new input to the lamp
@@ -23,6 +22,15 @@ function [u,error,cum_error] = pid_control(theta,r,prev_error,cum_error,time_ste
 %
 % December 2018; Last revision: 10-December-2018
 %------------- BEGIN CODE -----------
+
+%% Load settings
+settings.s = getPIDSettings();
+settings.s.Kp = Kp;
+settings.s.Ki = Ki;
+settings.s.Kd = Kd;
+settings.s.r = r;
+
+
 
 %% PID controller
 
