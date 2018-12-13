@@ -27,7 +27,7 @@ if strcmp(mode,'plants')
     if ~isfield(settings,'calibDate')
         settings.calibDate = '2016-01-29';
     end
-    settings.IT = 10000; 
+    settings.IT = 8000; 
 end
 if strcmp(mode,'lamp')
     settings.cosineCorrector = 1;

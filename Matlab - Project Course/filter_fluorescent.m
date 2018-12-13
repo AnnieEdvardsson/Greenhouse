@@ -21,12 +21,14 @@ s_settings.conv = signal_settings();
 
 %% Design filter
 wo = s_settings.conv.f/(s_settings.conv.fs/2);  % location of the notch, must be between 0 and 1                  
-bw = wo/10;                                    % bandwidth at -3 dB
+bw = wo/s_settings.conv.Qfactor;                                    % bandwidth at -3 dB
 [b,a] = iirnotch(wo,bw);                        % gives numerator and denominator coeffiecients for filter function
 
 %% Add filter to signal
 signal = detrend(signal);
+%z = filtfilt(b,a,signal);                         % filters the noisy signal, should leave noise only
 z = filter(b,a,signal);                         % filters the noisy signal, should leave noise only
+
 filtredSignal = signal-z;                       % Subtract the noise from original signal 
 
 end

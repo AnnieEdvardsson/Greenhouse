@@ -1,4 +1,4 @@
-function FanConfiguration(Setting)
+function FanConfiguration(Setting, lamp_ip)
 %
 % Syntax:  FanConfiguration(Setting)
 %
@@ -15,10 +15,6 @@ function FanConfiguration(Setting)
 %
 % December 2018; Last revision: 06-December-2018
 %------------- BEGIN CODE --------------
-
-settings.conv = getSinusSettings();
-lamp_ip = settings.conv.lamp_ip;
-
 
 switch Setting
     case "Default"

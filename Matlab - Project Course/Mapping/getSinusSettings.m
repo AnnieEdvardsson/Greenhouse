@@ -28,6 +28,6 @@ settings.lamp_ID =           "RX";
 
 settings.period =         60;           % period time in seconds
 settings.amplitude =      10;           % amplitude of excitation signal given in uE 
-settings.meanvalue =      40;           % The meanvalue of the sinus
+settings.meanvalue =      20;           % The meanvalue of the sinus
 
 end

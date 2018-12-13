@@ -1,21 +1,26 @@
-tStart = tic; % Restart clock
-pauseAfterLEDchange = 0.5;
-sampleTime = 2;
-period = 59;
-for i = 0:(period-1) 
-        %% Pause until it can be ensured that the LEDs are set
-    while toc(tStart) < sampleTime*i + pauseAfterLEDchange
-    end
-    
-    fprintf("0,5 + time: %2.1f \n", toc(tStart));
-    
-    
-    
-        %% Pause intil the sample time of the loop is finished
-    while toc(tStart) < sampleTime*(i+1)
-    end
-    
-    fprintf("TIME after loop: %2.1f \n", toc(tStart));
-    
-    
+clc
+clear 
+
+
+load("flourPlantsignal2.mat")
+load("flourLEDsignal3.mat")
+
+
+filtredSignal = filter_fluorescent(flourPlantsignal);
+plotOnTop(flourPlantsignal, filtredSignal, flourLEDsignal)
+
+
+
+function plotOnTop(var1, var2 ,var3)
+var1 = detrend(var1);
+var2 =detrend(var2);
+var3 =detrend(var3);
+figure
+hold on
+plot(var1);
+plot(var2);
+plot(var3);
+line([0,length(var1)+20],[0,0])
+legend("non filtered","filtered", "LEDsignal")
+%title(sprintf('Subplot 2:  %s', var2));
 end

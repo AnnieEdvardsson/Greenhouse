@@ -7,6 +7,8 @@ s_settings.fs = 1/s_settings.sampleTime;    % sample rate
 w = 2*pi/60;                                % angular frequency of sinusoid
 s_settings.f = w/(2*pi);                    % frequency of sinusoid
 
+s_settings.Qfactor = 2;
+
 
 
 
