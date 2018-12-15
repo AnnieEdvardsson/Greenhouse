@@ -19,7 +19,7 @@ function settings = getPIDSettings()
 settings =                  struct();
 settings.r =                0;          % Wanted phase shift
 settings.Kp =               1;          % Proportionate coefficient
-settings.Ki =               0;          % Integral coefficient
+settings.Ki =               1;          % Integral coefficient
 settings.Kd =               0;          % Derivativee coefficient
 
 end

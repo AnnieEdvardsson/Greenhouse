@@ -32,9 +32,14 @@ r =             settings.s.r;
 
 %% PID controller
 
-phase_error = r - theta;
-cum_error = cum_error + phase_error;
-u = phase_error*Kp + time_step*cum_error*Ki + (phase_error-prev_phase_error)/time_step*Kd;
+% phase_error = r - theta;
+% cum_error = cum_error + phase_error;
+% u = phase_error*Kp + time_step*cum_error*Ki + (phase_error-prev_phase_error)/time_step*Kd;
 
+%% NEW
+load("TF.mat");
 
+C = pid(Kp, Ki, Kd);
+
+u = feedback(C*TF, 1);
 end
