@@ -1,4 +1,4 @@
-function [u, phase_error, cum_error] = pid_control(theta, prev_phase_error, cum_error, time_step)
+function [backgroundIntensity, phase_error] = pid_control(theta, phase_error, time_step, backgroundIntensity)
 % Finds the new control input to the lamp based on error between
 % the desired phase shift and the estimated phase shift
 %
@@ -13,7 +13,7 @@ function [u, phase_error, cum_error] = pid_control(theta, prev_phase_error, cum_
 
 %
 % Outputs:
-%   u - new input to the lamp
+%   backgroundIntensity - new input to the lamp
 %   phase_error - error in this time step, stored for the derivative part
 %   cum_error - cumulative error, stored to calculate integral part
 %
@@ -32,8 +32,13 @@ r =             settings.s.r;
 
 %% PID controller
 
-phase_error = r - theta;
-cum_error = cum_error + phase_error;
-u = phase_error*Kp + time_step*cum_error*Ki + (phase_error-prev_phase_error)/time_step*Kd;
+phase_error = [phase_error, r - theta];
+cum_error = sum(phase_error);
+
+P = phase_error(end)*Kp;
+I = time_step*cum_error*Ki;
+D = (phase_error(end)-phase_error(end-1))/time_step*Kd;
+
+backgroundIntensity = [backgroundIntensity, P + I + D];
 
 end

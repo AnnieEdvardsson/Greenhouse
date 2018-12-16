@@ -20,8 +20,8 @@ function phase_deg = estimate_phase(x,y)
 L = length(x);
 
 %% Fourier transform both signals 
-x_fft = fft(x);
-y_fft = fft(y);
+x_fft = fft(detrend(x));
+y_fft = fft(detrend(y));
 
 %% Find the bin corresponding to the frequency we care about
 % using the knowledge that it has highest magnitude

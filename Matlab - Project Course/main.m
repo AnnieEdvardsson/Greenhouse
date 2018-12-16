@@ -26,11 +26,12 @@ settings_spec.m2 = getSpecSettings("plants");
 Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) communicating with the spectrometer(s) is (are) created and contained in Spectrometer.Wrapper
 
 %% Pre-define and initiate
-NrPeriods = 1;
-maxLengthVec = period * 7;
+NrPeriods = 5;
+maxLengthVec = period *3;
 
 flourLEDsignal = [];
 flourPlantsignal = [];
+phase_error2 = 0;
 
 % Start values
 phase_error = 0; 
@@ -42,28 +43,45 @@ cum_error = 0;
 FanConfiguration("Max", settings.s.lamp_ip);
 FanConfiguration("Max", settingsback.s.lamp_ip);
 
-% Start clock
-tStart = tic;               
-
 %% PRE LOOP (to generate flourLEDsignal and flourPlantsignal)
     
 % Change background light with the new wanted intensity
 generateBackgroundLight(backgroundIntensity);
 
+% plot during loop
+% figure(1);
+% % subplot(2,1,1)
+% PREfig_plant = plot(flourPlantsignal);
+% title(sprintf('Subplot 1:  Plant signal'));
+
+% subplot(2,1,2)
+% PREfig_LED = plot(flourLEDsignal);
+% title(sprintf('Subplot 2: LED signal'));
+% PREfig_plant = figure(1);
+% title(sprintf('Subplot 1:  Plant signal'));
+ 
+% Start clock
+tStart = tic; 
 for i = 0:maxLengthVec-1
     
     [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers);
- 
+%     if i >= 10
+%         LoopPlot(PREfig_plant, flourPlantsignal, flourLEDsignal, i)
+%     end
+
 end
 %% Plot flourPlantsignal and flourLEDsignal
 
 plotSub(flourPlantsignal, flourLEDsignal);
+%% Load
+% load('flourPlantsignal4.mat');
+% load('flourLEDsignal4.mat');
 
 %% MAIN LOOP
 tStart = tic; % Restart clock
-for i = 0:(period-1) * NrPeriods
+for i = 0:(period * NrPeriods)-1
     
-    [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, cum_error]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, cum_error, maxLengthVec, NrPeriods);
+    [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2);
 
 end
 %% Other 
@@ -128,7 +146,7 @@ function  [flourLEDsignal, flourPlantsignal]= PRELOOP(i, flourLEDsignal, flourPl
     end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, cum_error]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, prev_phase_error, cum_error, maxLengthVec, NrPeriods)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2)
 	fprintf("MAIN Loop: %i/%i : ", i+1, period * NrPeriods);
     t = period * NrPeriods * sampleTime -toc(tStart);
     mins = floor(t / 60);
@@ -145,7 +163,7 @@ function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, c
     
     %% Change background light with the new wanted intensity
     
-    generateBackgroundLight(backgroundIntensity);
+    generateBackgroundLight(backgroundIntensity(end));
     
     %% Pause until it can be ensured that the LEDs are set
     while toc(tStart) < sampleTime*i + pauseAfterLEDchange
@@ -159,19 +177,23 @@ function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, c
     flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, maxLengthVec);
     
     % Filter the measured fluoresence signal
-    filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
+    %filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
     
     % PLOT
-    plotOnTop(flourPlantsignal, filtredPlantFlourSignal)
+    % plotOnTop(flourPlantsignal, filtredPlantFlourSignal)
     
     %% Estimate the phase shift
-    phase_shift = estimate_phase(flourLEDsignal, filtredPlantFlourSignal);
+     phase_shift = estimate_phase(flourLEDsignal, flourPlantsignal);
+     phase_shift2 = estimate_phase_hilbert(flourLEDsignal, flourPlantsignal);
+     
+     phase_error2 = [phase_error, phase_shift2];
     
     %% Controller
     % PID controller
-    [backgroundIntensity, phase_error, cum_error] = pid_control(phase_shift, prev_phase_error, cum_error, sampleTime);
+    [backgroundIntensity, phase_error] = pid_control(phase_shift, phase_error, sampleTime, backgroundIntensity);
     
-    fprintf("flourLEDsignal= %2.1f, flourPlantsignal = %2.1f, backgroundIntensity= %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity); 
+    
+    fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end)); 
    
     %% Pause intil the sample time of the loop is finished
     while toc(tStart) < sampleTime*(i+1)
@@ -187,10 +209,10 @@ end
 function plotSub(var1, var2)
 subplot(2,1,1)
 plot(var1);
-title(sprintf('Subplot 1:  %s', var1));
+title(sprintf('Subplot 1:  Plant signal'));
 subplot(2,1,2)
 plot(var2);
-title(sprintf('Subplot 2:  %s', var2));
+title(sprintf('Subplot 2: LED signal'));
 end
 
 function plotOnTop(var1, var2)
@@ -203,4 +225,18 @@ plot(var2);
 line([0,length(var1)+20],[0,0])
 legend("non_filt","filt")
 %title(sprintf('Subplot 2:  %s', var2));
+end
+
+function PREfig_plant = LoopPlot(PREfig_plant, PlantSIgnal, LEDsignal, i)
+
+if i == 10
+    
+    % subplot(2,1,1)
+    PREfig_plant = plot(PlantSIgnal, 1:length(PlantSIgnal));
+
+end
+     set(PREfig_plant,'XData', PlantSIgnal, 'YData', 1:length(PlantSIgnal));
+     drawnow;
+     pause(0.5);
+
 end
