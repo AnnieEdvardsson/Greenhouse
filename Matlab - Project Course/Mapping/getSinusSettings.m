@@ -26,8 +26,8 @@ settings.sweepingsMatrix =  'Sweeping_RX2018-11-27-1414.mat';
 settings.lamp_ip =          '192.168.100.102'; 
 settings.lamp_ID =           "RX";
 
-settings.period =         60;           % period time in seconds
-settings.amplitude =      10;           % amplitude of excitation signal given in uE 
-settings.meanvalue =      20;           % The meanvalue of the sinus
+settings.period =         30;           % period time in seconds FEL
+settings.amplitude =      15;           % amplitude of excitation signal given in uE 
+settings.meanvalue =      17;           % The meanvalue of the sinus
 
 end

@@ -18,6 +18,9 @@ function phase_deg = estimate_phase_hilbert(x,y)
 
 %% Defines the length of the signal
 L = length(x);
+%% Detrend signals
+x = detrend(x);
+y = detrend(y);
 %% Convert time-domain signal into an analytic signal via the Hilbert transform
 x_h = hilbert(x);
 y_h = hilbert(y);
