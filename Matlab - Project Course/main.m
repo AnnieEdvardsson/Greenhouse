@@ -26,7 +26,7 @@ settings_spec.m2 = getSpecSettings("plants");
 Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) communicating with the spectrometer(s) is (are) created and contained in Spectrometer.Wrapper
 
 %% Pre-define and initiate
-NrPeriodsPRE = 6;
+NrPeriodsPRE = 7;
 NrPeriodsMAIN = 60-NrPeriodsPRE;
 
 maxLengthVec = 1000000;
@@ -43,6 +43,8 @@ phase_error = [];
 cum_error = 0;
 phase_error_meas = [];
 phase_error2_meas = [];
+phase_error3= [];
+phase_error3_meas= [];
 
 
 %% Other
@@ -80,6 +82,8 @@ for j = 1:length(backgroundIntensityVEC)
     cum_error = 0;
     phase_error_meas = [];
     phase_error2_meas = [];
+    phase_error3= [];
+    phase_error3_meas= [];
     %%
     backgroundIntensity  = backgroundIntensityVEC(j);
     % Change background light with the new wanted intensity
@@ -88,9 +92,9 @@ for j = 1:length(backgroundIntensityVEC)
     % Start clock
     tStart = tic;
     for i = 0:period*NrPeriodsPRE-1
-
+        
         [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period);
-
+        
     end
     %% Plot flourPlantsignal and flourLEDsignal
     
@@ -103,10 +107,14 @@ for j = 1:length(backgroundIntensityVEC)
     tStart = tic; % Restart clock
     for i = 0:(period * NrPeriodsMAIN)-1
         
-        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas);
+        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas);
     end
     try
         save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
+    catch
+    end
+    try
+        autoPush()
     catch
     end
 end
@@ -174,7 +182,7 @@ while toc(tStart) < sampleTime*(i+1)
 end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas)
 fprintf("MAIN Loop: %i/%i : ", i+1, period * NrPeriods);
 t = period * NrPeriods * sampleTime -toc(tStart);
 mins = floor(t / 60);
@@ -224,11 +232,19 @@ phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
 phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
 phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);
 
+try
+    phase_shift3_meas = estimate_phase_sinfit(inputLEDmeas, inputfluor, toc(tStart));
+    phase_shift3 = estimate_phase_sinfit(inputLED, inputfluor, toc(tStart));
+catch
+end
+
 phase_error = [phase_error, phase_shift];
 phase_error2 = [phase_error2, phase_shift2];
+phase_error3 = [phase_error3, phase_shift3];
+
 phase_error_meas = [phase_error_meas, phase_shift_meas];
 phase_error2_meas = [phase_error2_meas, phase_shift2_meas];
-
+phase_error3_meas = [phase_error3_meas, phase_shift3_meas];
 %% Controller
 % PID controller
 %[backgroundIntensity, phase_error] = pid_control(phase_shift, phase_error, sampleTime, backgroundIntensity);

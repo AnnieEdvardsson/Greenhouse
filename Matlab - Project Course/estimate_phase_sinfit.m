@@ -1,4 +1,4 @@
-function phase_deg = estimate_phase_sinfit(x,y)
+function phase_deg = estimate_phase_sinfit(x,y, time)
 %
 % Syntax: Estimates phase shift between two signals
 %
@@ -19,7 +19,7 @@ function phase_deg = estimate_phase_sinfit(x,y)
 A = 10;
 T = 60;
 offset = 0;
-t = 0:2:300-2;
+t = time-300+2:2:time;
 fit = @(b,x)  A*(sin(2*pi*t./T + b*pi/180)) + offset;      % Function to fit
 cost_y = @(b) sum((fit(b,t) - y).^2);                     % Least-Squares cost function
 theta_y = fminsearch(cost_y, 1);                        % Minimise Least-Squares
