@@ -64,8 +64,8 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % title(sprintf('Subplot 2: LED signal'));
 % PREfig_plant = figure(1);
 % title(sprintf('Subplot 1:  Plant signal'));
-%backgroundIntensityVEC = [0, 50, 100, 500, 1000, 2500, 5000];
-backgroundIntensityVEC = [100, 1000, 3500];
+backgroundIntensityVEC = [0, 10, 20, 50, 75, 100, 200, 300, 400, 500, 600, 650];
+%backgroundIntensityVEC = [50, 100, 150];
 
 for j = 1:length(backgroundIntensityVEC)
     flourLEDsignal = [];
@@ -106,7 +106,7 @@ for j = 1:length(backgroundIntensityVEC)
         [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas);
     end
     try
-        save(sprintf("AM_MODWorkspaceForBackground_%i", backgroundIntensityVEC(j)));
+        save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
     catch
     end
 end
