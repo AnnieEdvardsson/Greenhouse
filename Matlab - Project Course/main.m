@@ -64,7 +64,8 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % title(sprintf('Subplot 2: LED signal'));
 % PREfig_plant = figure(1);
 % title(sprintf('Subplot 1:  Plant signal'));
-backgroundIntensityVEC = [0, 50, 75, 100, 160, 200, 300, 500];
+%backgroundIntensityVEC = [0, 50, 100, 500, 1000, 2500, 5000];
+backgroundIntensityVEC = [100, 1000, 3500];
 
 for j = 1:length(backgroundIntensityVEC)
     flourLEDsignal = [];
@@ -87,12 +88,9 @@ for j = 1:length(backgroundIntensityVEC)
     % Start clock
     tStart = tic;
     for i = 0:period*NrPeriodsPRE-1
-        %
-        [flourLEDsignal, flourPlantsignal, measured_420Signal, measured_450Signal, measured_660Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, measured_450Signal, measured_660Signal, NrPeriodsPRE, period);
-        %     if i >= 10
-        %         LoopPlot(PREfig_plant, flourPlantsignal, flourLEDsignal, i)
-        %     end
-        %
+
+        [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period);
+
     end
     %% Plot flourPlantsignal and flourLEDsignal
     
@@ -105,7 +103,7 @@ for j = 1:length(backgroundIntensityVEC)
     tStart = tic; % Restart clock
     for i = 0:(period * NrPeriodsMAIN)-1
         
-        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, measured_450Signal, measured_660Signal]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, measured_450Signal, measured_660Signal);
+        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas);
     end
     try
         save(sprintf("AM_MODWorkspaceForBackground_%i", backgroundIntensityVEC(j)));
@@ -142,7 +140,7 @@ TurnOffLamp(settingsback.s.LEDs, settingsback.s.lamp_ip);
 % plot(meas_int);
 
 %%%%%%%%% FUNCTIONS %%%%%%%%%%%
-function  [flourLEDsignal, flourPlantsignal, measured_420Signal, measured_450Signal, measured_660Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, measured_450Signal, measured_660Signal, NrPeriodsPRE, period)
+function  [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period)
 fprintf("PRE Loop: %i/%i \n", i+1, period*NrPeriodsPRE);
 t = period*NrPeriodsPRE * sampleTime -toc(tStart);
 mins = floor(t / 60);
@@ -163,11 +161,9 @@ end
 
 %% Measure fluroescent from plants and store and process
 % Measure emitted flour from plants
-[measured_420, measured_450, measured_660, flourPlantValue] = measure_fluorescence(Spectrometers);
+[measured_420, flourPlantValue] = measure_fluorescence(Spectrometers);
 
 measured_420Signal = updateVector(measured_420Signal, measured_420, maxLengthVec);
-measured_450Signal = updateVector(measured_450Signal, measured_450, maxLengthVec);
-measured_660Signal = updateVector(measured_660Signal, measured_660, maxLengthVec);
 
 % Add returned flourPlantValue value to vector flourPlantsignal
 flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, maxLengthVec);
@@ -178,7 +174,7 @@ while toc(tStart) < sampleTime*(i+1)
 end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, measured_450Signal, measured_660Signal]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, measured_450Signal, measured_660Signal)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas)
 fprintf("MAIN Loop: %i/%i : ", i+1, period * NrPeriods);
 t = period * NrPeriods * sampleTime -toc(tStart);
 mins = floor(t / 60);
@@ -203,11 +199,10 @@ end
 
 %% Measure fluroescent from plants and store and process
 % Measure emitted fluoresence from plants
-[measured_420, measured_450, measured_660, flourPlantValue] = measure_fluorescence(Spectrometers);
+[measured_420, flourPlantValue] = measure_fluorescence(Spectrometers);
 
 measured_420Signal = updateVector(measured_420Signal, measured_420, maxLengthVec);
-measured_450Signal = updateVector(measured_450Signal, measured_450, maxLengthVec);
-measured_660Signal = updateVector(measured_660Signal, measured_660, maxLengthVec);
+
 
 % Add measured value to fluoresence signal vector
 flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, maxLengthVec);
@@ -244,10 +239,7 @@ fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = 
 %% Pause intil the sample time of the loop is finished
 while toc(tStart) < sampleTime*(i+1)
 end
-try
-    save(sprintf("WorkspaceForBackground_%i", backgroundIntensityVEC(j)));
-catch
-end
+
 end
 
 function TurnOffLamp(LEDs, lamp_ip)

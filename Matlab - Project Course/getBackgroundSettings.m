@@ -18,8 +18,8 @@ function settings = getBackgroundSettings()
 %------------- BEGIN CODE --------------
 settings =                  struct();
 settings.LEDs =             [450 451 660 661 5700 5701];
-settings.spectrum =         [0.6 0.6 0.4 0.4 0 0];
-settings.sweepingsMatrix =  'Sweeping_LX2018-12-11-1004.mat';
+settings.spectrum =         [0.6 0.6 0.4 0.4 0 0]; % - 40% blue, 60% red
+settings.sweepingsMatrix =  'Sweeping_LX2018-12-18-1059.mat';
 settings.lamp_ip =          '192.168.100.101'; 
 settings.lamp_ID =           "LX";
 
