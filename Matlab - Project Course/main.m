@@ -66,7 +66,7 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % title(sprintf('Subplot 2: LED signal'));
 % PREfig_plant = figure(1);
 % title(sprintf('Subplot 1:  Plant signal'));
-backgroundIntensityVEC = [75, 125, 0, 50];
+backgroundIntensityVEC = [175];
 %backgroundIntensityVEC = [50, 100, 150];
 
 for j = 1:length(backgroundIntensityVEC)
@@ -84,6 +84,8 @@ for j = 1:length(backgroundIntensityVEC)
     phase_error2_meas = [];
     phase_error3= [];
     phase_error3_meas= [];
+    phase_shift_NOfilter = [];
+    phase_shift2_NOFILTER = [];
     %%
     backgroundIntensity  = backgroundIntensityVEC(j);
     % Change background light with the new wanted intensity
@@ -107,7 +109,7 @@ for j = 1:length(backgroundIntensityVEC)
     tStart = tic; % Restart clock
     for i = 0:(period * NrPeriodsMAIN)-1
         
-        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas);
+        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER);
     end
     try
         save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
@@ -182,7 +184,7 @@ while toc(tStart) < sampleTime*(i+1)
 end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER)
 fprintf("MAIN Loop: %i/%i : ", i+1, period * NrPeriods);
 t = period * NrPeriods * sampleTime -toc(tStart);
 mins = floor(t / 60);
@@ -216,7 +218,7 @@ measured_420Signal = updateVector(measured_420Signal, measured_420, maxLengthVec
 flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, maxLengthVec);
 
 % Filter the measured fluoresence signal
-%filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
+filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
 
 % PLOT
 % plotOnTop(flourPlantsignal, filtredPlantFlourSignal)
@@ -224,10 +226,21 @@ flourPlantsignal = updateVector(flourPlantsignal, flourPlantValue, maxLengthVec)
 %% Estimate the phase shift
 inputLED = flourLEDsignal(length(flourLEDsignal)-149:end);
 inputLEDmeas = measured_420Signal(length(measured_420Signal)-149:end);
-inputfluor = flourPlantsignal(length(flourPlantsignal)-149:end);
+
+inputfluor = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-149:end);
+inputfluorNOFILTER = flourPlantsignal(length(flourPlantsignal)-149:end);
+
+
+phase_shift_NOfilter = estimate_phase(inputLED, inputfluorNOFILTER);
+phase_shift2_NOFILTER = estimate_phase_hilbert(inputLED, inputfluorNOFILTER);
 
 phase_shift = estimate_phase(inputLED, inputfluor);
 phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
+
+
+
+
+
 
 phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
 phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);

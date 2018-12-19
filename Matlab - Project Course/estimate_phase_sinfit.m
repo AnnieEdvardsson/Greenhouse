@@ -18,7 +18,7 @@ function phase_deg = estimate_phase_sinfit(x,y, time)
 
 x = detrend(x);
 y = detrend(y);
-A = 10;
+A = 15;
 T = 60;
 offset = 0;
 t = time-300+2:2:time;
