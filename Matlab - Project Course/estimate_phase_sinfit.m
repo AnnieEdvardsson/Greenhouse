@@ -16,6 +16,8 @@ function phase_deg = estimate_phase_sinfit(x,y, time)
 % December 2018; Last revision: 18-December-2018
 %------------- BEGIN CODE -----------
 
+x = detrend(x);
+y = detrend(y);
 A = 10;
 T = 60;
 offset = 0;
