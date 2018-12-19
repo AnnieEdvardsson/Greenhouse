@@ -66,7 +66,7 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % title(sprintf('Subplot 2: LED signal'));
 % PREfig_plant = figure(1);
 % title(sprintf('Subplot 1:  Plant signal'));
-backgroundIntensityVEC = [100, 160, 200, 300, 500];
+backgroundIntensityVEC = [75, 125, 0, 50];
 %backgroundIntensityVEC = [50, 100, 150];
 
 for j = 1:length(backgroundIntensityVEC)
