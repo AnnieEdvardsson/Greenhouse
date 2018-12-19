@@ -26,9 +26,9 @@ settings_spec.m2 = getSpecSettings("plants");
 Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) communicating with the spectrometer(s) is (are) created and contained in Spectrometer.Wrapper
 
 %% Pre-define and initiate
-NrPeriodsPRE = 6;
-%NrPeriodsMAIN = 60-NrPeriodsPRE;
-NrPeriodsMAIN = 8;
+NrPeriodsPRE = 7;
+NrPeriodsMAIN = 60-NrPeriodsPRE;
+%NrPeriodsMAIN = 8;
 
 maxLengthVec = 1000000;
 
