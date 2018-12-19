@@ -26,8 +26,9 @@ settings_spec.m2 = getSpecSettings("plants");
 Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) communicating with the spectrometer(s) is (are) created and contained in Spectrometer.Wrapper
 
 %% Pre-define and initiate
-NrPeriodsPRE = 7;
-NrPeriodsMAIN = 60-NrPeriodsPRE;
+NrPeriodsPRE = 6;
+%NrPeriodsMAIN = 60-NrPeriodsPRE;
+NrPeriodsMAIN = 8;
 
 maxLengthVec = 1000000;
 
@@ -39,7 +40,7 @@ measured_450Signal = [];
 measured_660Signal = [];
 
 % Start values
-phase_error = [];
+phase_error = 0;
 cum_error = 0;
 phase_error_meas = [];
 phase_error2_meas = [];
@@ -66,7 +67,7 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % title(sprintf('Subplot 2: LED signal'));
 % PREfig_plant = figure(1);
 % title(sprintf('Subplot 1:  Plant signal'));
-backgroundIntensityVEC = [175];
+backgroundIntensityVEC = [130];
 %backgroundIntensityVEC = [50, 100, 150];
 
 for j = 1:length(backgroundIntensityVEC)
@@ -78,7 +79,7 @@ for j = 1:length(backgroundIntensityVEC)
     measured_660Signal = [];
     
     % Start values
-    phase_error = [];
+    phase_error = 0;
     cum_error = 0;
     phase_error_meas = [];
     phase_error2_meas = [];
@@ -86,6 +87,7 @@ for j = 1:length(backgroundIntensityVEC)
     phase_error3_meas= [];
     phase_shift_NOfilter = [];
     phase_shift2_NOFILTER = [];
+    factor = [];
     %%
     backgroundIntensity  = backgroundIntensityVEC(j);
     % Change background light with the new wanted intensity
@@ -93,23 +95,23 @@ for j = 1:length(backgroundIntensityVEC)
     
     % Start clock
     tStart = tic;
-    for i = 0:period*NrPeriodsPRE-1
-        
-        [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period);
-        
-    end
+%     for i = 0:period*NrPeriodsPRE-1
+%         
+%         [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period);
+%         
+%     end
     %% Plot flourPlantsignal and flourLEDsignal
     
     % plotSub(flourPlantsignal, flourLEDsignal);
     % % Load
-    % load('flourPlantsignal4.mat');
-    % load('flourLEDsignal4.mat');
+    load('flourPlantsignal5.mat');
+    load('flourLEDsignal5.mat');
     
     %% MAIN LOOP
     tStart = tic; % Restart clock
     for i = 0:(period * NrPeriodsMAIN)-1
         
-        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER);
+        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriodsMAIN, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER, factor);
     end
     try
         save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
@@ -184,7 +186,7 @@ while toc(tStart) < sampleTime*(i+1)
 end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, maxLengthVec, NrPeriods, phase_error2, measured_420Signal, phase_error_meas, phase_error2_meas, phase_error3, phase_error3_meas, phase_shift_NOfilter, phase_shift2_NOFILTER, factor)
 fprintf("MAIN Loop: %i/%i : ", i+1, period * NrPeriods);
 t = period * NrPeriods * sampleTime -toc(tStart);
 mins = floor(t / 60);
@@ -225,14 +227,14 @@ filtredPlantFlourSignal = filter_fluorescent(flourPlantsignal);
 
 %% Estimate the phase shift
 inputLED = flourLEDsignal(length(flourLEDsignal)-149:end);
-inputLEDmeas = measured_420Signal(length(measured_420Signal)-149:end);
+%inputLEDmeas = measured_420Signal(length(measured_420Signal)-149:end);
 
-inputfluor = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-149:end);
-inputfluorNOFILTER = flourPlantsignal(length(flourPlantsignal)-149:end);
+inputfluor = flourPlantsignal(length(flourPlantsignal)-149:end);
+% inputfluorNOFILTER = flourPlantsignal(length(flourPlantsignal)-149:end);
 
 
-phase_shift_NOfilter = estimate_phase(inputLED, inputfluorNOFILTER);
-phase_shift2_NOFILTER = estimate_phase_hilbert(inputLED, inputfluorNOFILTER);
+% phase_shift_NOfilter = estimate_phase(inputLED, inputfluorNOFILTER);
+% phase_shift2_NOFILTER = estimate_phase_hilbert(inputLED, inputfluorNOFILTER);
 
 phase_shift = estimate_phase(inputLED, inputfluor);
 phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
@@ -242,28 +244,36 @@ phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
 
 
 
-phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
-phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);
+% phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
+% phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);
+% 
+% try
+%     phase_shift3_meas = estimate_phase_sinfit(inputLEDmeas, inputfluor, toc(tStart));
+%     phase_shift3 = estimate_phase_sinfit(inputLED, inputfluor, toc(tStart));
+% catch
+% end
 
-try
-    phase_shift3_meas = estimate_phase_sinfit(inputLEDmeas, inputfluor, toc(tStart));
-    phase_shift3 = estimate_phase_sinfit(inputLED, inputfluor, toc(tStart));
-catch
-end
+%phase_error = [phase_error, phase_shift];
+% phase_error2 = [phase_error2, phase_shift2];
+% phase_error3 = [phase_error3, phase_shift3];
 
-phase_error = [phase_error, phase_shift];
-phase_error2 = [phase_error2, phase_shift2];
-phase_error3 = [phase_error3, phase_shift3];
-
-phase_error_meas = [phase_error_meas, phase_shift_meas];
-phase_error2_meas = [phase_error2_meas, phase_shift2_meas];
-phase_error3_meas = [phase_error3_meas, phase_shift3_meas];
+% phase_error_meas = [phase_error_meas, phase_shift_meas];
+% phase_error2_meas = [phase_error2_meas, phase_shift2_meas];
+% phase_error3_meas = [phase_error3_meas, phase_shift3_meas];
 %% Controller
 % PID controller
-%[backgroundIntensity, phase_error] = pid_control(phase_shift, phase_error, sampleTime, backgroundIntensity);
+[factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
+
+newIntensity = backgroundIntensity(end)+factor;
+if newIntensity < 0
+    backgroundIntensity = [backgroundIntensity, 0];
+else
+    backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)-factor];
+end
 
 
-fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end));
+
+fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i, factor = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor);
 
 %% Pause intil the sample time of the loop is finished
 while toc(tStart) < sampleTime*(i+1)

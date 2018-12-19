@@ -1,4 +1,4 @@
-function [backgroundIntensity, phase_error] = pid_control(theta, phase_error, time_step, backgroundIntensity)
+function [factor ,phase_error] = pid_control(theta, phase_error, time_step, factor)
 % Finds the new control input to the lamp based on error between
 % the desired phase shift and the estimated phase shift
 %
@@ -39,6 +39,6 @@ P = phase_error(end)*Kp;
 I = time_step*cum_error*Ki;
 D = (phase_error(end)-phase_error(end-1))/time_step*Kd;
 
-backgroundIntensity = [backgroundIntensity, P + I + D];
+factor = [P + I + D];
 
 end
