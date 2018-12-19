@@ -39,6 +39,6 @@ P = phase_error(end)*Kp;
 I = time_step*cum_error*Ki;
 D = (phase_error(end)-phase_error(end-1))/time_step*Kd;
 
-factor = [P + I + D];
+factor = [factor, P + I + D];
 
 end

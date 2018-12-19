@@ -264,16 +264,16 @@ phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
 % PID controller
 [factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
 
-newIntensity = backgroundIntensity(end)+factor;
+newIntensity = backgroundIntensity(end)-factor;
 if newIntensity < 0
     backgroundIntensity = [backgroundIntensity, 0];
 else
-    backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)-factor];
+    backgroundIntensity = [backgroundIntensity, newIntensity];
 end
 
 
 
-fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i, factor = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor);
+fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i, factor = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor(end));
 
 %% Pause intil the sample time of the loop is finished
 while toc(tStart) < sampleTime*(i+1)
