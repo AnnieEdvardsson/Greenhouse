@@ -85,6 +85,8 @@ for j = 1:length(backgroundIntensityVEC)
     cum_error = 0;
     phase_errorFILTER = [];
     phase_errorFILTERFILTER = [];
+    phase_error2FILTERFILTER = [];
+
  
     %%
     backgroundIntensity  = backgroundIntensityVEC(j);
@@ -109,7 +111,7 @@ for j = 1:length(backgroundIntensityVEC)
     tStart = tic; % Restart clock
     for i = 0:(period * NrPeriodsMAIN)-1
         
-        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_errorFILTER, phase_errorFILTERFILTER, measured_420Signal, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, phase_errorFILTER, phase_errorFILTERFILTER, maxLengthVec, NrPeriodsMAIN, measured_420Signal, factor);
+        [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_errorFILTERFILTER, phase_error2, phase_error2FILTERFILTER, measured_420Signal, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, phase_errorFILTERFILTER, phase_error2, phase_error2FILTERFILTER, maxLengthVec, NrPeriodsMAIN, measured_420Signal, factor);
     end
     try
         save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
@@ -184,7 +186,7 @@ while toc(tStart) < sampleTime*(i+1)
 end
 end
 
-function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_errorFILTER, phase_errorFILTERFILTER, measured_420Signal, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, phase_errorFILTER, phase_errorFILTERFILTER, maxLengthVec, NrPeriods, measured_420Signal, factor)
+function  [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_errorFILTERFILTER, phase_error2, phase_error2FILTERFILTER, measured_420Signal, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, phase_errorFILTERFILTER, phase_error2, phase_error2FILTERFILTER, maxLengthVec, NrPeriods, measured_420Signal, factor)
 fprintf("MAIN Loop: %i/%i : ", i+1, period * NrPeriods);
 t = period * NrPeriods * sampleTime -toc(tStart);
 mins = floor(t / 60);
@@ -235,14 +237,14 @@ inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-149:e
 % phase_shift2_NOFILTER = estimate_phase_hilbert(inputLED, inputfluorNOFILTER);
 
 phase_shift = estimate_phase(inputLED, inputfluor);
-phase_shiftFILTER = estimate_phase(inputfluorFILTER, inputfluor);
-phase_shiftFILTERFILTER = estimate_phase(inputfluorFILTER, inputLEDFILTERED);
-
+phase_shiftFILTERFILTER = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
+phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
+phase_shift2FILTERFILTER = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
 
 phase_error = [phase_error, phase_shift];
-phase_errorFILTER = [phase_errorFILTER, phase_shiftFILTER];
 phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftFILTERFILTER];
-
+phase_error2 = [phase_error2, phase_shift2];
+phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shift2FILTERFILTER];
 
 %phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
 % phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);
