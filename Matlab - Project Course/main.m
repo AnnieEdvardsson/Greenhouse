@@ -27,8 +27,8 @@ Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) commu
 
 %% Pre-define and initiate
 NrPeriodsPRE = 7;
-NrPeriodsMAIN = 60-NrPeriodsPRE;
-%NrPeriodsMAIN = 8;
+%NrPeriodsMAIN = 60-NrPeriodsPRE;
+NrPeriodsMAIN = 8;
 
 maxLengthVec = 1000000;
 
@@ -67,8 +67,10 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % title(sprintf('Subplot 2: LED signal'));
 % PREfig_plant = figure(1);
 % title(sprintf('Subplot 1:  Plant signal'));
-backgroundIntensityVEC = [0, 20, 40, 60, 80, 90, 100, 110, 120, 140, 150, 160, 170, 180, 200];
+% backgroundIntensityVEC = [0, 20, 40, 60, 80, 90, 100, 110, 120, 140, 150, 160, 170, 180, 200];
 %backgroundIntensityVEC = [50, 100, 150];
+
+backgroundIntensityVEC = 140;
 
 for j = 1:length(backgroundIntensityVEC)
     flourLEDsignal = [];
@@ -237,14 +239,15 @@ inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-149:e
 % phase_shift2_NOFILTER = estimate_phase_hilbert(inputLED, inputfluorNOFILTER);
 
 phase_shift = estimate_phase(inputLED, inputfluor);
-phase_shiftFILTERFILTER = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
-phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
-phase_shift2FILTERFILTER = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
+% phase_shiftFILTERFILTER = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
+% 
+% phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
+% phase_shift2FILTERFILTER = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
 
 phase_error = [phase_error, phase_shift];
-phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftFILTERFILTER];
-phase_error2 = [phase_error2, phase_shift2];
-phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shift2FILTERFILTER];
+% phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftFILTERFILTER];
+% phase_error2 = [phase_error2, phase_shift2];
+% phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shift2FILTERFILTER];
 
 %phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
 % phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);
@@ -268,9 +271,14 @@ factor = 0;
 % else
 %     backgroundIntensity = [backgroundIntensity, newIntensity];
 % end
+if i < 4*60
+    int = 140;
+else
+    int = 200;
+end
 
-backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)];
-
+% backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)];
+backgroundIntensity = [backgroundIntensity, int];
 fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i, factor = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor(end));
 
 %% Pause intil the sample time of the loop is finished
