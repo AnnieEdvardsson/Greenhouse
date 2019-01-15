@@ -1,6 +1,6 @@
 %% This is the main-file for the Greenhouse project'
 %% Clear and close
-clear; close all; clc; format long; dbstop if error;
+% clear; close all; clc; format long; dbstop if error;
 
 %% Define paths
 
@@ -28,24 +28,24 @@ Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) commu
 %% Pre-define and initiate
 NrPeriodsPRE = 7;
 %NrPeriodsMAIN = 60-NrPeriodsPRE;
-NrPeriodsMAIN = 8;
+NrPeriodsMAIN = 30;
 
-maxLengthVec = 1000000;
-
-flourLEDsignal = [];
-flourPlantsignal = [];
-phase_error2 = [];
-measured_420Signal = [];
-measured_450Signal = [];
-measured_660Signal = [];
-
-% Start values
-phase_error = 0;
-cum_error = 0;
-phase_error_meas = [];
-phase_error2_meas = [];
-phase_error3= [];
-phase_error3_meas= [];
+% maxLengthVec = 1000000;
+% 
+% flourLEDsignal = [];
+% flourPlantsignal = [];
+% phase_error2 = [];
+% measured_420Signal = [];
+% measured_450Signal = [];
+% measured_660Signal = [];
+% 
+% % Start values
+% phase_error = 0;
+% cum_error = 0;
+% phase_error_meas = [];
+% phase_error2_meas = [];
+% phase_error3= [];
+% phase_error3_meas= [];
 
 
 %% Other
@@ -70,38 +70,38 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % backgroundIntensityVEC = [0, 20, 40, 60, 80, 90, 100, 110, 120, 140, 150, 160, 170, 180, 200];
 %backgroundIntensityVEC = [50, 100, 150];
 
-backgroundIntensityVEC = 140;
-
-for j = 1:length(backgroundIntensityVEC)
-    flourLEDsignal = [];
-    flourPlantsignal = [];
-
-    measured_420Signal = [];
-    measured_450Signal = [];
-    measured_660Signal = [];
-    
-    factor = 0;
-    
-    % Start values
-    phase_error = [];
-    cum_error = 0;
-    phase_errorFILTER = [];
-    phase_errorFILTERFILTER = [];
-    phase_error2FILTERFILTER = [];
-
- 
-    %%
-    backgroundIntensity  = backgroundIntensityVEC(j);
-    % Change background light with the new wanted intensity
-    generateBackgroundLight(backgroundIntensity);
-    
-    % Start clock
-    tStart = tic;
-    for i = 0:period*NrPeriodsPRE-1
-        
-        [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period);
-        
-    end
+% backgroundIntensityVEC = 200;
+backgroundIntensity = [backgroundIntensity, 200];
+% for j = 1:length(backgroundIntensityVEC)
+%     flourLEDsignal = [];
+%     flourPlantsignal = [];
+% 
+%     measured_420Signal = [];
+%     measured_450Signal = [];
+%     measured_660Signal = [];
+%     
+%     factor = 0;
+%     
+%     % Start values
+%     phase_error = [];
+%     cum_error = 0;
+%     phase_errorFILTER = [];
+%     phase_errorFILTERFILTER = [];
+%     phase_error2FILTERFILTER = [];
+% 
+%  
+%     %%
+%     backgroundIntensity  = backgroundIntensityVEC(j);
+%     % Change background light with the new wanted intensity
+%     generateBackgroundLight(backgroundIntensity);
+%     
+%     % Start clock
+%     tStart = tic;
+%     for i = 0:period*NrPeriodsPRE-1
+%         
+%         [flourLEDsignal, flourPlantsignal, measured_420Signal]= PRELOOP(i, flourLEDsignal, flourPlantsignal, tStart, sampleTime, pauseAfterLEDchange, maxLengthVec, Spectrometers, measured_420Signal, NrPeriodsPRE, period);
+%         
+%     end
     %% Plot flourPlantsignal and flourLEDsignal
     
     % plotSub(flourPlantsignal, flourLEDsignal);
@@ -116,14 +116,15 @@ for j = 1:length(backgroundIntensityVEC)
         [flourLEDsignal, flourPlantsignal, backgroundIntensity, phase_error, phase_errorFILTERFILTER, phase_error2, phase_error2FILTERFILTER, measured_420Signal, factor]= MAINLOOP(i, flourLEDsignal, flourPlantsignal, backgroundIntensity, tStart, sampleTime, pauseAfterLEDchange, period, Spectrometers, phase_error, phase_errorFILTERFILTER, phase_error2, phase_error2FILTERFILTER, maxLengthVec, NrPeriodsMAIN, measured_420Signal, factor);
     end
     try
-        save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
+%         save(sprintf("WorkspaceForBackground_15jan_%i", backgroundIntensityVEC(j)));
+          save(sprintf("WorkspaceForBackground_15jan_140TO200"));
     catch
     end
     try
         autoPush()
     catch
     end
-end
+% end
 %% Other
 % Turn off fan RX
 FanConfiguration("Off", settings.s.lamp_ip);
@@ -271,14 +272,14 @@ factor = 0;
 % else
 %     backgroundIntensity = [backgroundIntensity, newIntensity];
 % end
-if i < 4*60
-    int = 140;
-else
-    int = 200;
-end
+% if i < 30*60
+%     int = 140;
+% else
+%     int = 200;
+% end
 
-% backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)];
-backgroundIntensity = [backgroundIntensity, int];
+backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)];
+% backgroundIntensity = [backgroundIntensity, int];
 fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i, factor = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor(end));
 
 %% Pause intil the sample time of the loop is finished
