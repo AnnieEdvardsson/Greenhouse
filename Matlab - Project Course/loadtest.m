@@ -2,22 +2,22 @@ close all
 clear 
 clc
 
-backgroundIntensityVEC = [0, 50, 75, 100, 160, 200, 300, 500];
-
-j = 2;
-
-load(sprintf("AM_MODWorkspaceForBackground_%i", backgroundIntensityVEC(j)))
-
-figure(1)
-plot(0:2:2*length(flourLEDsignal)-1, measured_420Signal)
-factor = mean(measured_420Signal)/17;
-hold on
-plot(0:2:2*length(flourLEDsignal)-1, flourLEDsignal*factor)
-title(sprintf("Excitation signal with BI %i", backgroundIntensityVEC(j)))
-%title(sprintf("Excitation signal", backgroundIntensityVEC(j)))
-xlabel("Seconds")
-ylabel("Normalized light intensity")
-legend("Calculated excitation signal", "Measured excitation signal")
+% backgroundIntensityVEC = [0, 50, 75, 100, 160, 200, 300, 500];
+% 
+% j = 2;
+% 
+% load(sprintf("WorkspaceForBackground_%i", backgroundIntensityVEC(j)))
+% 
+% figure(1)
+% plot(0:2:2*length(flourLEDsignal)-1, measured_420Signal)
+% factor = mean(measured_420Signal)/17;
+% hold on
+% plot(0:2:2*length(flourLEDsignal)-1, flourLEDsignal*factor)
+% title(sprintf("Excitation signal with BI %i", backgroundIntensityVEC(j)))
+% %title(sprintf("Excitation signal", backgroundIntensityVEC(j)))
+% xlabel("Seconds")
+% ylabel("Normalized light intensity")
+% legend("Calculated excitation signal", "Measured excitation signal")
 
 % figure(2)
 % plot(0:2:2*length(phase_error2)-1, phase_error2*-1)

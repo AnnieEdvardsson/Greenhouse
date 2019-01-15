@@ -31,14 +31,14 @@ Kd =            settings.s.Kd;
 r =             settings.s.r;
 
 %% PID controller
-
 phase_error = [phase_error, r - theta];
+phase_error_mean = mean(phase_error(end-25: end));
 cum_error = sum(phase_error);
 
-P = phase_error(end)*Kp;
+P = phase_error_mean*Kp;
 I = time_step*cum_error*Ki;
-D = (phase_error(end)-phase_error(end-1))/time_step*Kd;
+% D = (phase_error(end)-phase_error(end-1))/time_step*Kd;
 
-factor = [factor, P + I + D];
+factor = [factor, P + I];
 
 end

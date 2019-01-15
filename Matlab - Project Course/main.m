@@ -26,9 +26,9 @@ settings_spec.m2 = getSpecSettings("plants");
 Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) communicating with the spectrometer(s) is (are) created and contained in Spectrometer.Wrapper
 
 %% Pre-define and initiate
-NrPeriodsPRE = 7;
-%NrPeriodsMAIN = 60-NrPeriodsPRE;
-NrPeriodsMAIN = 60;
+NrPeriodsPRE = 3;
+NrPeriodsMAIN = 60-NrPeriodsPRE;
+% NrPeriodsMAIN = 60;
 
 maxLengthVec = 1000000;
 
@@ -117,7 +117,7 @@ for j = 1:length(backgroundIntensityVEC)
     end
     try
         %save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
-        save(sprintf("WorkspaceForBackground_120_TO_220"));
+        save(sprintf("WorkspaceForBackground_TEST_PID3"));
     catch
     end
     try
@@ -229,58 +229,37 @@ filtredFlourLEDSignal = filter_fluorescent(flourLEDsignal);
 % plotOnTop(flourPlantsignal, filtredPlantFlourSignal)
 
 %% Estimate the phase shift
-inputLED = flourLEDsignal(length(flourLEDsignal)-149:end);
-inputLEDFILTERED = filtredFlourLEDSignal(length(filtredFlourLEDSignal)-149:end);
+inputLED = flourLEDsignal(length(flourLEDsignal)-3*period:end);
+inputLEDFILTERED = filtredFlourLEDSignal(length(filtredFlourLEDSignal)-3*period:end);
 
-inputfluor       = flourPlantsignal(length(flourPlantsignal)-149:end);
-inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-149:end);
-
-
-% phase_shift_NOfilter = estimate_phase(inputLED, inputfluorNOFILTER);
-% phase_shift2_NOFILTER = estimate_phase_hilbert(inputLED, inputfluorNOFILTER);
+inputfluor       = flourPlantsignal(length(flourPlantsignal)-3*period:end);
+inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-3*period:end);
 
 phase_shift = estimate_phase(inputLED, inputfluor);
-% phase_shiftFILTERFILTER = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
-% 
-% phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
-% phase_shift2FILTERFILTER = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
+phase_shiftfilt = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
 
-phase_error = [phase_error, phase_shift];
-% phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftFILTERFILTER];
-% phase_error2 = [phase_error2, phase_shift2];
-% phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shift2FILTERFILTER];
-
-%phase_shift_meas = estimate_phase(inputLEDmeas, inputfluor);
-% phase_shift2_meas = estimate_phase_hilbert(inputLEDmeas, inputfluor);
-% 
-% try
-%     phase_shift3_meas = estimate_phase_sinfit(inputLEDmeas, inputfluor, toc(tStart));
-%     phase_shift3 = estimate_phase_sinfit(inputLED, inputfluor, toc(tStart));
-% catch
-% end
-
+% phase_error = [phase_error, phase_shift-4];
+phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftfilt-4];
 
 
 %% Controller
 % PID controller
-% [factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
-% 
-factor = 0;
-% newIntensity = backgroundIntensity(end)-factor;
-% if newIntensity < 0
-%     backgroundIntensity = [backgroundIntensity, 0];
-% else
-%     backgroundIntensity = [backgroundIntensity, newIntensity];
-% end
-if i < period*30
-    int = 120;
+if mod(i+1, 30) == 0
+[factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
+
+else 
+    factor = 0;
+    phase_error = [phase_error, 4-phase_shift];
+end
+    
+newIntensity = backgroundIntensity(end) + factor;
+if newIntensity < 0
+    backgroundIntensity = [backgroundIntensity, 0];
 else
-    int = 220;
+     backgroundIntensity = [backgroundIntensity, newIntensity];
 end
 
-% backgroundIntensity = [backgroundIntensity, backgroundIntensity(end)];
-backgroundIntensity = [backgroundIntensity, int];
-fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %i, Phase error = %i, factor = %i \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor(end));
+fprintf("LED signal= %2.1f, Plant signal = %2.3f, Intensity = %4.3f, Phase error = %4.3f, factor = %2.3f \n\n",flourLEDsignal(end), flourPlantsignal(end), backgroundIntensity(end), phase_error(end), factor(end));
 
 %% Pause intil the sample time of the loop is finished
 while toc(tStart) < sampleTime*(i+1)
