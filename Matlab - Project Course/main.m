@@ -27,7 +27,7 @@ Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) commu
 
 %% Pre-define and initiate
 NrPeriodsPRE = 4;
-NrPeriodsMAIN = 60-NrPeriodsPRE;
+NrPeriodsMAIN = 60+60-NrPeriodsPRE;
 % NrPeriodsMAIN = 60;
 
 maxLengthVec = 1000000;
@@ -70,7 +70,7 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % backgroundIntensityVEC = [0, 20, 40, 60, 80, 90, 100, 110, 120, 140, 150, 160, 170, 180, 200];
 %backgroundIntensityVEC = [50, 100, 150];
 
-backgroundIntensityVEC = 180;
+backgroundIntensityVEC = 500;
 
 for j = 1:length(backgroundIntensityVEC)
     flourLEDsignal = [];
