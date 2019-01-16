@@ -117,7 +117,7 @@ for j = 1:length(backgroundIntensityVEC)
     end
     try
         %save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
-        save(sprintf("WorkspaceForBackground_TEST_filt"));
+        save(sprintf("WorkspaceForBackground_TEST_filt_PID"));
     catch
     end
     try
@@ -235,29 +235,28 @@ inputLEDFILTERED = filtredFlourLEDSignal(length(filtredFlourLEDSignal)-4*period:
 inputfluor       = flourPlantsignal(length(flourPlantsignal)-4*period:end);
 inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-4*period:end);
 
-phase_shift = estimate_phase(inputLED, inputfluor);
-phase_shiftfilt = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
+% phase_shift = estimate_phase(inputLED, inputfluor);
+phase_shift = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
 
-phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
-phase_shiftfilt2 = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
+% phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
+% phase_shiftfilt2 = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
 
-phase_error = [phase_error, phase_shift];
-phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftfilt];
+% phase_error = [phase_error, phase_shift];
+% phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftfilt];
 
-phase_error2 = [phase_error2, phase_shift2];
-phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shiftfilt2];
+% phase_error2 = [phase_error2, phase_shift2];
+% phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shiftfilt2];
 
 
 %% Controller
 % PID controller
-% if mod(i+1, 15) == 0
-% [factor, phase_error] = pid_control(phase_shiftfilt, phase_error, sampleTime, factor);
-% 
-% else 
-%     factor = 0;
-%     phase_error = [phase_error, 4-phase_shift];
-% end
-       factor = 0;
+if mod(i+1, 15) == 0
+[factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
+
+else 
+    factor = 0;
+    phase_error = [phase_error, 4-phase_shift];
+end
 
 newIntensity = backgroundIntensity(end) + factor;
 if newIntensity < 0
