@@ -70,7 +70,7 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % backgroundIntensityVEC = [0, 20, 40, 60, 80, 90, 100, 110, 120, 140, 150, 160, 170, 180, 200];
 %backgroundIntensityVEC = [50, 100, 150];
 
-backgroundIntensityVEC = 500;
+backgroundIntensityVEC = 180;
 
 for j = 1:length(backgroundIntensityVEC)
     flourLEDsignal = [];
@@ -117,7 +117,7 @@ for j = 1:length(backgroundIntensityVEC)
     end
     try
         %save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
-        save(sprintf("WorkspaceForBackground_TEST_PID5"));
+        save(sprintf("WorkspaceForBackground_TEST_filt"));
     catch
     end
     try
@@ -238,20 +238,27 @@ inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-4*per
 phase_shift = estimate_phase(inputLED, inputfluor);
 phase_shiftfilt = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
 
-% phase_error = [phase_error, phase_shift-4];
-phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftfilt-4];
+phase_shift2 = estimate_phase_hilbert(inputLED, inputfluor);
+phase_shiftfilt2 = estimate_phase_hilbert(inputLEDFILTERED, inputfluorFILTER);
+
+phase_error = [phase_error, phase_shift];
+phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftfilt];
+
+phase_error2 = [phase_error2, phase_shift2];
+phase_error2FILTERFILTER = [phase_error2FILTERFILTER, phase_shiftfilt2];
 
 
 %% Controller
 % PID controller
-if mod(i+1, 15) == 0
-[factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
+% if mod(i+1, 15) == 0
+% [factor, phase_error] = pid_control(phase_shiftfilt, phase_error, sampleTime, factor);
+% 
+% else 
+%     factor = 0;
+%     phase_error = [phase_error, 4-phase_shift];
+% end
+       factor = 0;
 
-else 
-    factor = 0;
-    phase_error = [phase_error, 4-phase_shift];
-end
-    
 newIntensity = backgroundIntensity(end) + factor;
 if newIntensity < 0
     backgroundIntensity = [backgroundIntensity, 0];
