@@ -32,10 +32,12 @@ r =             settings.s.r;
 
 %% PID controller
 phase_error = [phase_error, r - theta];
-phase_error_mean = mean(phase_error(end-25: end));
+% phase_error_mean = mean(phase_error(end-25: end));
 cum_error = sum(phase_error);
 
-P = phase_error_mean*Kp;
+% P = phase_error_mean*Kp;
+P = phase_error*Kp;
+
 I = time_step*cum_error*Ki;
 % D = (phase_error(end)-phase_error(end-1))/time_step*Kd;
 

@@ -7,6 +7,8 @@ clc
 % j = 2;
 % 
 % load(sprintf("WorkspaceForBackground_%i", backgroundIntensityVEC(j)))
+load(sprintf("WorkspaceForBackground_TEST_PID.mat"))
+plot(phase_error)
 % 
 % figure(1)
 % plot(0:2:2*length(flourLEDsignal)-1, measured_420Signal)
@@ -37,22 +39,22 @@ clc
 % xlabel("Seconds")
 % ylabel("Degrees")
 
-figure(4)
-plot(0:2:2*length(phase_error)-1, phase_error)
-hold on
-plot(0:2:2*length(phase_error2)-1, phase_error2*-1)
-legend("Estimated phase shift using DFT method", "Estimated phase shift using hilbert method")
-title(sprintf("Phase shift with background intensity %i", backgroundIntensityVEC(j)))
-xlabel("Seconds")
-ylabel("Degrees")
-
+% figure(4)
+% plot(0:2:2*length(phase_error)-1, phase_error)
+% hold on
+% plot(0:2:2*length(phase_error2)-1, phase_error2*-1)
+% legend("Estimated phase shift using DFT method", "Estimated phase shift using hilbert method")
+% title(sprintf("Phase shift with background intensity %i", backgroundIntensityVEC(j)))
+% xlabel("Seconds")
+% ylabel("Degrees")
 % 
-figure(5)
-plot(0:2:2*length(measured_450Signal)-1, measured_450Signal)
-hold on
-plot(0:2:2*length(measured_660Signal)-1, measured_660Signal)
-line([0,2*length(measured_450Signal)],[backgroundIntensity,backgroundIntensity])
-legend("Measured signal 440", "Measured sugnal 660")
-title(sprintf("Phase shift with background intensity %i", backgroundIntensityVEC(j)))
-xlabel("Seconds")
-ylabel("Intensity")
+% % 
+% figure(5)
+% plot(0:2:2*length(measured_450Signal)-1, measured_450Signal)
+% hold on
+% plot(0:2:2*length(measured_660Signal)-1, measured_660Signal)
+% line([0,2*length(measured_450Signal)],[backgroundIntensity,backgroundIntensity])
+% legend("Measured signal 440", "Measured sugnal 660")
+% title(sprintf("Phase shift with background intensity %i", backgroundIntensityVEC(j)))
+% xlabel("Seconds")
+% ylabel("Intensity")

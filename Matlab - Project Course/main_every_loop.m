@@ -26,7 +26,7 @@ settings_spec.m2 = getSpecSettings("plants");
 Spectrometers    = jsetUpSpectrometers(settings_spec); %The java-object(s) communicating with the spectrometer(s) is (are) created and contained in Spectrometer.Wrapper
 
 %% Pre-define and initiate
-NrPeriodsPRE = 10;
+NrPeriodsPRE = 3;
 NrPeriodsMAIN = 60-NrPeriodsPRE;
 % NrPeriodsMAIN = 60;
 
@@ -70,7 +70,7 @@ FanConfiguration("Max", settingsback.s.lamp_ip);
 % backgroundIntensityVEC = [0, 20, 40, 60, 80, 90, 100, 110, 120, 140, 150, 160, 170, 180, 200];
 %backgroundIntensityVEC = [50, 100, 150];
 
-backgroundIntensityVEC = 180;
+backgroundIntensityVEC = 120;
 
 for j = 1:length(backgroundIntensityVEC)
     flourLEDsignal = [];
@@ -117,7 +117,7 @@ for j = 1:length(backgroundIntensityVEC)
     end
     try
         %save(sprintf("WorkspaceForBackground_18dec_%i", backgroundIntensityVEC(j)));
-        save(sprintf("WorkspaceForBackground_TEST_PID5"));
+        save(sprintf("WorkspaceForBackground_TEST_PID4_every_loop"));
     catch
     end
     try
@@ -229,11 +229,11 @@ filtredFlourLEDSignal = filter_fluorescent(flourLEDsignal);
 % plotOnTop(flourPlantsignal, filtredPlantFlourSignal)
 
 %% Estimate the phase shift
-inputLED = flourLEDsignal(length(flourLEDsignal)-4*period:end);
-inputLEDFILTERED = filtredFlourLEDSignal(length(filtredFlourLEDSignal)-4*period:end);
+inputLED = flourLEDsignal(length(flourLEDsignal)-3*period:end);
+inputLEDFILTERED = filtredFlourLEDSignal(length(filtredFlourLEDSignal)-3*period:end);
 
-inputfluor       = flourPlantsignal(length(flourPlantsignal)-4*period:end);
-inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-4*period:end);
+inputfluor       = flourPlantsignal(length(flourPlantsignal)-3*period:end);
+inputfluorFILTER = filtredPlantFlourSignal(length(filtredPlantFlourSignal)-3*period:end);
 
 phase_shift = estimate_phase(inputLED, inputfluor);
 phase_shiftfilt = estimate_phase(inputLEDFILTERED, inputfluorFILTER);
@@ -244,14 +244,9 @@ phase_errorFILTERFILTER = [phase_errorFILTERFILTER, phase_shiftfilt-4];
 
 %% Controller
 % PID controller
-if mod(i+1, 15) == 0
+
 [factor, phase_error] = pid_control(phase_shift, phase_error, sampleTime, factor);
 
-else 
-    factor = 0;
-    phase_error = [phase_error, 4-phase_shift];
-end
-    
 newIntensity = backgroundIntensity(end) + factor;
 if newIntensity < 0
     backgroundIntensity = [backgroundIntensity, 0];
